@@ -24,7 +24,7 @@ query = """
     {
         plantaPorEspecie(especie: "Tulbalghia"){
             id
-            
+            nombre
         }
     }
 """
