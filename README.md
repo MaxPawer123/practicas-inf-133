@@ -20,4 +20,4 @@ Fecha LIMITE de entrega: 06/04/2024
 Encuentra las instrucciones de la segunda practica en la carpeta [`practica-dos`](practica-dos/README.md)
 
 # Practica Examen Final
-Encuentra las instrucciones del examen final en la carpeta [`practica-tres`](practica-tres/README.md)
+Encuentra las instrucciones del examen final en la carpeta [`practica-tres`](practica-tres/README.md)  

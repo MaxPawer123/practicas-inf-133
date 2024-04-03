@@ -19,44 +19,42 @@ query_lista = """
 response = requests.post(url, json={'query': query_lista})
 print(response.text)
 
+
+print("---------plantaPorEspecie--------------")
 # Definir la consulta GraphQL con parametros po especie 
 query = """
     {
-        plantaPorEspecie(especie: "Tulbalghia"){
+        plantaPorEspecie(especie:"Tulbalghia"){
             id
-            nombre
+            
         }
     }
 """
 
 # Solicitud POST al servidor GraphQL
-response = requests.post(url, json={'query': query})
-print(response.text)
+response1 = requests.post(url, json={'query': query})
+print(response1.text)
 
 
+print("-----plantaPorFrutos-----------")
 # Definir la consulta GraphQL por  Buscar las plantas que tienen frutos
-query = """
+query2 = """
     {
-        plantaPorEspecie(frutos: True){
-            id
-            nombre
-            especie
-            edad
+        plantaSiTieneFrutos(frutos:True){
+           nombre
         }
     }
 """
 
 # Solicitud POST al servidor GraphQL
-response = requests.post(url, json={'query': query})
-print(response.text)
-
-
+response2 = requests.post(url, json={'query': query2})
+print(response2.text)
 
 
 # Definir la consulta GraphQL para crear nuevo estudiante
 query_crear = """
 mutation {
-        crearPlanta( nombre="Alfalfa", especie="Armeria ", edad=30, altura=40,frutos=false") {
+        crearPlanta( nombre="Alfalfa", especie="Armeria", edad=30, altura=40,frutos=false) {
             planta {
                 id
                 nombre
@@ -79,9 +77,8 @@ print(response.text)
 # Definir la consulta GraphQL para eliminar un estudiante
 query_eliminar = """
 mutation {
-        deletePlanta(id: 3) {
+        deletePlanta(id: 2) {
             planta {
-                id
                 nombre
                 especie
                 edad

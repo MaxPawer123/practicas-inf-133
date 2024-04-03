@@ -29,7 +29,7 @@ De las plantas se debe almacenar la siguiente información:
 **Rutas esperadas:**
 - `/graphql`
 
-## Ejercicio 3
+## Ejercicio 3  
 Aplicando los principios de desarrollo de Software DRY, KISS, YAGNI y la S de SOLID construye un API RESTful para gestionar la información de los pacientes de un hospital. La API debe permitir:
 - Crear un paciente
 - Listar todos los pacientes
@@ -38,7 +38,7 @@ Aplicando los principios de desarrollo de Software DRY, KISS, YAGNI y la S de SO
 - Listar a los pacientes que atiende el Doctor `Pedro Pérez`
 - Actualizar la información de un paciente
 - Eliminar un paciente
-
+   
 De los pacientes se debe almacenar la siguiente información:
 - CI (identificador único)
 - Nombre
