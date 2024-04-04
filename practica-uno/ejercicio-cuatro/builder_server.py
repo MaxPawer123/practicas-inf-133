@@ -147,6 +147,7 @@ class PacienteHandler(BaseHTTPRequestHandler):
             data = HTTPDataHandler.handle_reader(self)
             response_data = self.controller.create_paciente(data)
             HTTPDataHandler.handle_response(self, 200, response_data.__dict__)
+        
         else:
             HTTPDataHandler.handle_response(self, 404, {"Error": "Ruta no existente"})
 

@@ -23,6 +23,13 @@ nuevo_paciente = {
 post_response = requests.request(method="POST", url=ruta_post, json=nuevo_paciente)
 print(post_response.text)
 
+# PUT /deliveries/{vehicle_id}
+aniamal_id_to_update = 1
+updated_animal_data = {
+    "nombre": "Jose"
+}
+response = requests.request(f"{url}/{aniamal_id_to_update}", json=updated_animal_data)
+print("Vehículo actualizado:", response.json())
 
 # GET filtrando por nombre con query params
 print("Listar a los pacientes que tienen diagnostico de Diabetes")
@@ -35,6 +42,8 @@ print("Listar a los pacientes que atiende el Doctor `Pedro Pérez`")
 ruta_get = url + "pacientes?doctor=Pedro Pérez"
 get_response = requests.request(method="GET", url=ruta_get)
 print(get_response.text)
+
+
 
 
 

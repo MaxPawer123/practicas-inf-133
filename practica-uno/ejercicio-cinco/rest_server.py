@@ -6,25 +6,25 @@ from urllib.parse import urlparse, parse_qs
 animales = [
     {
         "id": 1,
-        "nombre": "Pedrito",
+        "nombre": "Leon",
         "especie": "Carnivoro",
-        "genero": "Leon",
+        "genero": "masculino",
         "edad": 30,
         "peso": "100kg"
     },
     {
         "id": 2,
-        "nombre": "Juan",
+        "nombre": "Foca",
         "especie": "Mamifero",
-        "genero": "Foca",
+        "genero": "femenina",
         "edad": 60,
         "peso": "200kg"
     },
     {
         "id": 3,
-        "nombre": "Jose",
+        "nombre": "perro",
         "especie": "domestico",
-        "genero": "perro",
+        "genero": "femenina ",
         "edad": 20,
         "peso": "60kg"
     },

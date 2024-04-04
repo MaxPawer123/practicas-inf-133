@@ -1,23 +1,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from graphene import ObjectType, String, Int, List, Schema, Field, Mutation,Boolean
-"""
-Construye un API con GraphQL para gestionar el seguimiento de las plantas de un vivero. La API debe permitir:
-- Crear una planta
-- Listar todas las plantas
-- Buscar plantas por especie
-- Buscar las plantas que tienen frutos
-- Actualizar la información de una planta
-- Eliminar una planta
 
-De las plantas se debe almacenar la siguiente información:
-- ID (identificador único)
-- Nombre común (nombre popular)
-- Especie (nombre científico)
-- Edad (en meses)
-- Altura (en cm)
-- Frutos (booleano)
-"""
 
 class Planta(ObjectType):
     id = Int()
@@ -31,7 +15,8 @@ class Planta(ObjectType):
 class Query(ObjectType):
     plantas = List(Planta)
     planta_por_especie = Field(Planta, especie=String())
-    planta_si_tiene_frutos=Field(Planta, frutos=Boolean())
+    planta_por_altura=List(Planta, altura=String())
+    planta_por_fruto=List(Planta, frutos=Boolean())
     def resolve_plantas(root, info):
         return plantas
     
@@ -40,13 +25,16 @@ class Query(ObjectType):
             if planta.especie == especie:
                 return planta
         return None
+    def resolve_planta_por_altura(root, info, altura):
+        plantas_filtradas=[planta for planta in plantas if planta.altura==altura]
+        return plantas_filtradas
     
-    def resolve_planta_si_tiene_frutos(root, info, frutos):
-        for planta in plantas:
-            if planta.frutos == frutos:
-                return planta
-        return None
-
+    def resolve_planta_por_fruto(root, info, frutos):
+        plantas_filtradas=[planta for planta in plantas if planta.frutos==frutos]
+        
+        return plantas_filtradas
+    
+    
 class CrearPlanta(Mutation):
     class Arguments:
         nombre = String()
@@ -64,11 +52,27 @@ class CrearPlanta(Mutation):
             especie=especie, 
             edad=edad,
             altura=altura,
-            frutos=frutos
+            frutos=frutos,
         )
         plantas.append(nuevo_planta)
-
+    
         return CrearPlanta(planta=nuevo_planta)
+
+class ActualizarPlanta(Mutation):
+    class Arguments:
+        id = Int()
+        edad=Int()
+        altura=Int()
+    planta = Field(Planta)
+    
+    def mutate(root, info, id,edad,altura):
+        for planta in plantas:
+            if planta.id == id:
+                planta.edad=edad
+                planta.altura=altura                
+                return ActualizarPlanta(planta=planta)
+        return None
+
 
 class DeletePlanta(Mutation):
     class Arguments:
@@ -87,10 +91,11 @@ class Mutations(ObjectType):
     delete_planta = DeletePlanta.Field()
 
 plantas = [
-    Planta(
-        id=1, nombre="Girasol", especie="Tulbalghia ", edad=20, altura=30,frutos=True),
+    Planta(id=1, nombre="Girasol", especie="Tulbalghia", edad=20, altura=30,frutos=True),
     Planta(id=2, nombre="Margarita", especie="Chlorophytum ", edad=25, altura=40,frutos=False),
-    
+    Planta(
+        id=3, nombre="Rosa", especie="bonito", edad=30, altura=30,frutos=True),
+    Planta(id=4, nombre="Coca", especie="Curativa ", edad=25, altura=40,frutos=False),
 ]
 
 schema = Schema(query=Query, mutation=Mutations)
@@ -102,8 +107,42 @@ class GraphQLRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", "application/json")
         self.end_headers()
         self.wfile.write(json.dumps(data).encode("utf-8"))
+    
+    def do_GET(self):
+        if self.path == "/graphql":
+            content_length = int(self.headers["Content-Length"])
+            data = self.rfile.read(content_length)
+            data = json.loads(data.decode("utf-8"))
+            print(data)
+            result = schema.execute(data["query"])
+            self.response_handler(200, result.data)
+        else:
+            self.response_handler(404, {"Error": "Ruta no ex0istente"})
 
+    def do_DELETE(self):
+        if self.path == "/graphql":
+            content_length = int(self.headers["Content-Length"])
+            data = self.rfile.read(content_length)
+            data = json.loads(data.decode("utf-8"))
+            print(data)
+            result = schema.execute(data["query"])
+            self.response_handler(200, result.data)
+        else:
+            self.response_handler(404, {"Error": "Ruta no existente"})
+
+    
     def do_POST(self):
+        if self.path == "/graphql":
+            content_length = int(self.headers["Content-Length"])
+            data = self.rfile.read(content_length)
+            data = json.loads(data.decode("utf-8"))
+            print(data)
+            result = schema.execute(data["query"])
+            self.response_handler(200, result.data)
+        else:
+            self.response_handler(404, {"Error": "Ruta no existente"})
+
+    def do_PUT(self):
         if self.path == "/graphql":
             content_length = int(self.headers["Content-Length"])
             data = self.rfile.read(content_length)

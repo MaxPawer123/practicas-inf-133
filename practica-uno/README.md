@@ -4,7 +4,8 @@ Completa tus datos personales en la siguiente tabla:
 -------------------------
 | Nombres  | Apellidos  | CI   |
 | -------- | ---------- | ---- |
-| `nombre` | `apellido` | `ci` |
+| `Ghilmar David` | `Mamani Valeriano` | `13440467lp` |
+
 
 ## Ejercicio 1
 Construye un servidor con el protocolo SOAP que permita a un cliente realizar las operaciones de suma, resta, multiplicación y división de dos números enteros.
@@ -56,7 +57,7 @@ De los pacientes se debe almacenar la siguiente información:
 - GET `/pacientes/?doctor={doctor}`
 - PUT `/pacientes/{ci}`
 - DELETE `/pacientes/{ci}`
-
+ 
 ## Ejercicio 4
 Aplica el patron de diseño BUILDER al ejercicio 3.
 
@@ -102,6 +103,7 @@ De las partidas se debe almacenar la siguiente información:
 - Elemento del jugador (piedra, papel o tijera)
 - Elemento del servidor (piedra, papel o tijera)
 - Resultado (ganó, perdió o empató)
+
 
 **Rutas esperadas:**
 - POST `/partidas`
