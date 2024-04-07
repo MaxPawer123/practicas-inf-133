@@ -1,83 +1,95 @@
 import requests
 import json
 
-url = "http://localhost:8000/zoologicos"
+url = "http://localhost:8000/animales"
 headers = {"Content-Type": "application/json"}
 
-# POST /zoologicos
-new_animal_data = {
-    "nombre": "Oso",
-    "especie": "mamifero",
-    "genero": "masculino",
-    "edad": 30,
-    "peso":"2000kg"
-    
+new_animal = {
+        "animal_type": "Mamifero",
+        "nombre": "Leon",
+        "especie": "Carnivoro",
+        "genero": "Macho",
+        "edad": 5,
+        "peso": 190
 }
-response = requests.post(url=url, json=new_animal_data, headers=headers)
-print(response.json())
-  
-new_animal_data = {
-    "nombre": "Condor",
-    "especie": "ave",
-    "genero": "femenina",
-    "edad": 30, 
-    "peso": "15kg"
+response = requests.post(url=url, json=new_animal, headers=headers)
+print(response.text)
+
+new_animal = {
+        "animal_type": "Ave",
+        "nombre": "Aguila real",
+        "especie": "Viento",
+        "genero": "Hembra",
+        "edad": 10,
+        "peso": 7
 }
-response = requests.post(url=url, json=new_animal_data, headers=headers)
-print(response.json())
+response = requests.post(url=url, json=new_animal, headers=headers)
+print(response.text)
 
-
-new_animal_data = {
-    "nombre": "Serpiente",
-    "especie": "reptil",
-    "genero": "masculino",
-    "edad": 60, 
-    "peso": "90kg"
+new_animal = {
+        "animal_type": "Reptil",
+        "nombre": "Tortuga laud",
+        "especie": "Dermochelys coriacea",
+        "genero": "Hembra",
+        "edad": 30,
+        "peso": 700
 }
-response = requests.post(url=url, json=new_animal_data, headers=headers)
-print(response.json())
+response = requests.post(url=url, json=new_animal, headers=headers)
+print(response.text)
 
-new_animal_data = {
-    "nombre": "Rana",
-    "especie": "anfibio",
-    "genero": "masculino",
-    "edad": 50, 
-    "peso": "80kg"
+new_animal = {
+        "animal_type": "Anfibio",
+        "nombre": "Salamandra comun",
+        "especie": "Salamandra salamandra",
+        "genero": "Indefinido",
+        "edad": 30,
+        "peso":10
 }
-response = requests.post(url=url, json=new_animal_data, headers=headers)
-print(response.json())
+response = requests.post(url=url, json=new_animal, headers=headers)
+print(response.text)
 
-
-new_animal_data = {
-    "nombre": "Pez Payaso",
-    "especie": "pez",
-    "genero": "femenina",
-    "edad": 30, 
-    "peso": "15kg"
+new_animal = {
+        "animal_type": "Pez",
+        "nombre": "Pez payaso",
+        "especie": "Acuatico",
+        "genero": "Macho",
+        "edad": 60,
+        "peso": 30
 }
-response = requests.post(url=url, json=new_animal_data, headers=headers)
-print(response.json())
+response = requests.post(url=url, json=new_animal, headers=headers)
+print(response.text)
 
-# GET /zoologicos
+print("Listado de todos los animales del Zoologico")
 response = requests.get(url=url)
-print(response.json())
+print(response.text)
 
-# PUT /deliveries/{vehicle_id}
-aniamal_id_to_update = 1
-updated_animal_data = {
-    "nombre": "Salamandra"
+print("--- Animales por especie ---")
+especie = "Carnivoro"
+response_especie = requests.get(f"{url}/?especie={especie}")
+print(response_especie.text)
+
+print("--- Animales por genero ---")
+genero = "Hembra"
+response_genero = requests.get(f"{url}/?genero={genero}")
+print(response_genero.text)
+
+print("--- Actualización de animal ---")
+id = 1
+actualizacion_animal = {
+    "edad": 6,
+    "peso": 300
 }
-response = requests.put(f"{url}/{aniamal_id_to_update}", json=updated_animal_data)
-print("Vehículo actualizado:", response.json())
-# GET /deliveries
-response = requests.get(url=url)
-print(response.json())
+response = requests.put(f"{url}/{id}", json=actualizacion_animal)
+print(response.text)
 
-# DELETE /deliveries/{vehicle_id}
-aniamal_id_to_update = 1
-response = requests.delete(f"{url}/{aniamal_id_to_update}")
-print("Animal eliminado:", response.json())
+print("--- Eliminar animal ---")
+id = 2
+response_eliminar = requests.delete(f"{url}/{id}")
+print(response_eliminar.text)
 
-# GET /deliveries
+print("Listar ANIMALES")
 response = requests.get(url=url)
-print(response.json())
+print(response.text)
+
+
+

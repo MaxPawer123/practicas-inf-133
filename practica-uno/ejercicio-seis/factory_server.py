@@ -1,60 +1,57 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
+from urllib import parse as urlparse
 
-# Base de datos simulada de vehículos
 animales = {}
 
-
-class ZoologicoAnimal:
-    def __init__(self, nombre, especie,genero,edad, peso):
+class DeliveryAnimal:
+    def __init__(self, animal_type, nombre, especie, genero, edad, peso):
+        self.animal_type = animal_type
         self.nombre = nombre
         self.especie = especie
         self.genero = genero
         self.edad = edad
         self.peso = peso
-
-
-class Mamifero(ZoologicoAnimal):
-    def __init__(self,  nombre,genero,edad, peso):
-        super().__init__("mamifero",nombre,genero,edad, peso)
-
-
-class Ave(ZoologicoAnimal):
-    def __init__(self, nombre,genero,edad, peso):
-        super().__init__("ave", nombre,genero,edad, peso)
-
-class Reptil(ZoologicoAnimal):
-    def __init__(self, nombre,genero,edad, peso):
-        super().__init__("reptil", nombre,genero,edad, peso)
-
-class Anfibio(ZoologicoAnimal):
-    def __init__(self, nombre, genero,edad, peso):
-        super().__init__("anfibio", nombre,genero,edad, peso)
-
-class Pez(ZoologicoAnimal):
-    def __init__(self, nombre, genero,edad, peso):
-        super().__init__("pez", nombre,genero,edad, peso)
-
-
-class ZoologicoFactory:
-    @staticmethod
-    def create_animal(nombre, especie,genero,edad, peso):
-        if especie == "mamifero":
-            return Mamifero( nombre,genero,edad, peso)
-        elif especie == "ave":
-            return Ave( nombre,genero,edad, peso)
-        elif especie == "reptil":
-            return Reptil( nombre,genero,edad, peso)
-        elif especie == "anfibio":
-            return Anfibio( nombre,genero,edad, peso)
-        elif especie == "pez":
-            return Pez(nombre,genero,edad, peso)
         
+
+class Mamifero(DeliveryAnimal):
+    def __init__(self, nombre, especie, genero, edad, peso):
+        super().__init__("Mamifero", nombre, especie, genero, edad, peso)
+
+class Ave(DeliveryAnimal):
+    def __init__(self, nombre, especie, genero, edad, peso):
+        super().__init__("Ave", nombre, especie, genero, edad, peso)
+        
+class Reptil(DeliveryAnimal):
+    def __init__(self, nombre, especie, genero, edad, peso):
+        super().__init__("Reptil", nombre, especie, genero, edad, peso)
+
+class Anfibio(DeliveryAnimal):
+    def __init__(self, nombre, especie, genero, edad, peso):
+        super().__init__("Anfibio", nombre, especie, genero, edad, peso)
+        
+class Pez(DeliveryAnimal):
+    def __init__(self, nombre, especie, genero, edad, peso):
+        super().__init__("Pez", nombre, especie, genero, edad, peso)
+
+class DeliveriFactory:
+    @staticmethod
+    def create_animal(animal_type, nombre, especie, genero, edad, peso):
+        if animal_type == "Mamifero":
+            return Mamifero(nombre, especie, genero, edad, peso)
+        elif animal_type == "Ave":
+            return Ave(nombre, especie, genero, edad, peso)
+        elif animal_type == "Reptil":
+            return Reptil(nombre, especie, genero, edad, peso)
+        elif animal_type == "Anfibio":
+            return Anfibio(nombre, especie, genero, edad, peso)
+        elif animal_type == "Pez":
+            return Pez(nombre, especie, genero, edad, peso)
         else:
-            raise ValueError("Tipo de vehículo de entrega no válido")
-
-
-class HTTPDataHandler:
+            raise ValueError("Tipo de animal no válido")
+        
+class HTTPResponseHandler:
+    
     @staticmethod
     def handle_response(handler, status, data):
         handler.send_response(status)
@@ -67,129 +64,135 @@ class HTTPDataHandler:
         content_length = int(handler.headers["Content-Length"])
         post_data = handler.rfile.read(content_length)
         return json.loads(post_data.decode("utf-8"))
-
-
-class ZoologicoService:
+    
+class DeliveryService:
+    
     def __init__(self):
-        self.factory = ZoologicoFactory()
-
+        self.factory = DeliveriFactory()
+        
     def add_animal(self, data):
+        animal_type = data.get("animal_type", None)
         nombre = data.get("nombre", None)
         especie = data.get("especie", None)
-        genero = data.get("genero", None)
+        genero =data.get("genero", None)
         edad = data.get("edad", None)
         peso = data.get("peso", None)
+        delivery_animales = self.factory.create_animal(animal_type, nombre, especie, genero, edad, peso)
+        id_nuevo = max(animales.keys()) + 1 if animales else 1
+        animales[id_nuevo] = delivery_animales
         
-        zoologico_animal = self.factory.create_animal(
-            nombre, especie,genero,edad, peso
-        )
-        animales[len(animales) + 1] = zoologico_animal
-        return zoologico_animal
-
+        return delivery_animales
+    
     def list_animales(self):
         return {index: animal.__dict__ for index, animal in animales.items()}
-
-    def update_animal(self, animal_id, data):
-        if animal_id in animales:
-            animal = animales[animal_id]
-            nombre = data.get("nombre", None)
-            genero = data.get("genero", None)
+    
+    def buscar_animales_especie(self, especie):
+        return {index: animal.__dict__ for index, animal in animales.items() if animal.especie == especie}
+    
+    def buscar_animales_genero(self, genero):
+        return {index: animal.__dict__ for index, animal in animales.items() if animal.genero == genero} 
+    
+    def update_animal(self, id_animal, data):
+        if id_animal in animales:
+            animal = animales[id_animal]
             edad = data.get("edad", None)
             peso = data.get("peso", None)
-
-            if nombre:
-                animal.nombre = nombre
-            if genero:
-                animal.genero = genero
             if edad:
-                animal.edad =edad
+                animal.edad = edad
             if peso:
                 animal.peso = peso
-            
             return animal
+        return None
+    
+    def delete_animal(self, id_animal):
+        if id_animal in animales:
+            animales.pop(id_animal)
+            return {"message": "Animal eliminado correctamente"}
         else:
-            raise None
-        
-  #recibimos un nombre un delete
-    def delete_animal(self, animal_id):
-        if animal_id in animales:
-            del animales[animal_id]
-            return {"message": "Animal eliminado"}
-        else:
-            return None
-
-
-class ZoologicoRequestHandler(BaseHTTPRequestHandler):
+            return {"error": "Animal no encontrado"}
+    
+class DeliveryRequestHandler(BaseHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
-        self.zoologico_service = ZoologicoService()
+        self.delivery_service = DeliveryService()
         super().__init__(*args, **kwargs)
-
-    def do_POST(self):
-        if self.path == "/zoologicos":
-            data = HTTPDataHandler.handle_reader(self)
-            response_data = self.zoologico_service.add_animal(data)
-            HTTPDataHandler.handle_response(self, 201, response_data.__dict__)
-        else:
-            HTTPDataHandler.handle_response(
-                self, 404, {"message": "Ruta no encontrada"}
-            )
-
+        
     def do_GET(self):
-        if self.path == "/zoologicos":
-            response_data = self.zoologico_service.list_animales()
-            HTTPDataHandler.handle_response(self, 200, response_data)
+        parsed_path = urlparse.urlparse(self.path)
+        query_params = urlparse.parse_qs(parsed_path.query)
+    
+        #Listar todos los animales
+        if parsed_path.path == "/animales":
+            data = self.delivery_service.list_animales()
+            HTTPResponseHandler.handle_response(self, 200, data)        
+        
+        #Buscar animales por especie
+        elif self.path.startswith("/animales") and "especie" in query_params:
+            especie = query_params["especie"][0]
+            animales_especie = self.delivery_service.buscar_animales_especie(especie)
+            if animales_especie:
+                HTTPResponseHandler.handle_response(self, 200, animales_especie)
+            else:
+                HTTPResponseHandler.handle_response(self,204,{})
+        
+        #Buscar animales por género    
+        elif self.path.startswith("/animales") and "genero" in query_params:
+            genero = query_params["genero"][0]
+            animales_genero = self.delivery_service.buscar_animales_genero(genero)
+            if animales_genero:
+                HTTPResponseHandler.handle_response(self, 200, animales_genero)
+            else:
+                HTTPResponseHandler.handle_response(self,204,{})
+        
         else:
-            HTTPDataHandler.handle_response(
-                self, 404, {"message": "Ruta no encontrada"}
-            )
+            HTTPResponseHandler.handle_response(self, 404, {"message": "Ruta no encontrada"})
 
+    
+    def do_POST(self):
+        #Crear un animal
+        if self.path == "/animales":
+            data = HTTPResponseHandler.handle_reader(self)
+            response_data = self.delivery_service.add_animal(data)
+            HTTPResponseHandler.handle_response(self, 201, response_data.__dict__)
+        else:
+            HTTPResponseHandler.handle_response(self, 404, {"message": "Ruta no encontrada"})
+    
+    
     def do_PUT(self):
-        if self.path.startswith("/zoologicos/"):
-            animal_id = int(self.path.split("/")[-1])
-            data = HTTPDataHandler.handle_reader(self)
-            response_data = self.zoologico_service.update_animal(animal_id, data)
+        #Actualizar la información de un animal
+        if self.path.startswith("/animales/"):
+            id = int(self.path.split("/")[-1])
+            data = HTTPResponseHandler.handle_reader(self)
+            response_data = self.delivery_service.update_animal(id, data)
             if response_data:
-                HTTPDataHandler.handle_response(self, 200, response_data.__dict__)
+                HTTPResponseHandler.handle_response(self, 200, response_data.__dict__)
             else:
-                HTTPDataHandler.handle_response(
-                    self, 404, {"message": "Animal no encontrado"}
-                )
+                HTTPResponseHandler.handle_response(self, 404, {"Error": "Animal no encontrado"})
         else:
-            HTTPDataHandler.handle_response(
-                self, 404, {"message": "Ruta no encontrada"}
-            )
-
+            HTTPResponseHandler.handle_response(self, 404, {"Error": "Ruta no encontrada"})
+                
     def do_DELETE(self):
-        if self.path.startswith("/zoologicos/"):
-            animal_id = int(self.path.split("/")[-1])
-            response_data = self.zoologico_service.delete_animal(animal_id)
-            if response_data:
-                HTTPDataHandler.handle_response(self, 200, response_data)
+        #Eliminar un animal
+        if self.path.startswith("/animales/"):
+            id = int(self.path.split("/")[-1])
+            deleted_animal = self.delivery_service.delete_animal(id)
+            if animales:
+                HTTPResponseHandler.handle_response(self, 200, deleted_animal)
             else:
-                HTTPDataHandler.handle_response(
-                    self, 404, {"message": "Animal no encontrado"}
-                )
+                HTTPResponseHandler.handle_response(self, 404, {"Error": "Animal no encontrado"})
         else:
-            HTTPDataHandler.handle_response(
-                self, 404, {"message": "Ruta no encontrada"}
-            )
-
-
-def main():
+            HTTPResponseHandler.handle_response(self, 404, {"Error": "Ruta no encontrada"})
+            
+def run_server(port=8000):
     try:
-        server_address = ("", 8000)
-        httpd = HTTPServer(server_address, ZoologicoRequestHandler)
-        print("Iniciando servidor HTTP en puerto 8000...")
+        server_address = ("", port)
+        httpd = HTTPServer(server_address, DeliveryRequestHandler)
+        print(f"Iniciando servidor web en http://localhost:{port}/")
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("Apagando servidor HTTP")
-        httpd.socket.close()
-        
+            print("\nDeteniendo el servidor HTTP...")
+            httpd.server_close()
+            print("Servidor detenido correctamente.")
+
 
 if __name__ == "__main__":
-    main()
-    
-    
-    
-    
-          
+    run_server()

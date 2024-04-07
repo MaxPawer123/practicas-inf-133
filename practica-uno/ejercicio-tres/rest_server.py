@@ -1,12 +1,11 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
-
-
 from urllib.parse import urlparse, parse_qs
 
 pacientes = [
+    
     {
-        "ci": 1,
+        "ci": 112233,
         "nombre": "Pedrito",
         "apellido": "García",
         "edad": 25,
@@ -14,39 +13,34 @@ pacientes = [
         "diagnostico": "Cancer",
         "doctor": "Ariel"
     },
+    
     {
-        "ci": 2,
+        "ci": 334562,
         "nombre": "Jose",
         "apellido": "Mamani",
         "edad": 20,
         "genero": "Masculino",
         "diagnostico": "Diabetes",
-        "doctor": "Pedro Pérez"
+        "doctor": "Doctor Pedro Perez"
     },
-      {
-        "ci": 3,
+    
+    {
+        "ci": 135454,
         "nombre": "Luz",
         "apellido": "Choque",
         "edad": 25,
         "genero": "Femenina",
         "diagnostico": "fdf",
-        "doctor": "Pedro Pérez"
+        "doctor": "Doctor Pedro Perez"
     },
-      
+
 ]
 
 
 class PacientesService:
-    @staticmethod
-    def find_patient(ci):
-        return next(
-            (paciente for paciente in pacientes if pacientes["ci"] == ci),
-            None,
-        )
-
+    
     @staticmethod
     def add_patient(data):
-        data["ci"] = len(pacientes) + 1
         pacientes.append(data)
         return pacientes
 
@@ -54,16 +48,23 @@ class PacientesService:
     def update_patient(ci, data):
         paciente = PacientesService.find_patient(ci)
         if paciente:
-            paciente.update(data)
+            indice=pacientes.index(paciente)
+            paciente[indice].update(data)
             return pacientes
         else:
             return None
 
     @staticmethod
-    def delete_patient():
-        pacientes.clear()
-        return pacientes
+    def delete_patient(ci):
+        for paciente in pacientes:
+            if paciente["ci"]==ci:
+                pacientes.remove(paciente)
+                return pacientes
+        return None
     
+    @staticmethod
+    def find_patient(ci):
+        return next((paciente for paciente in pacientes if paciente["ci"] == ci), None)
 
     @staticmethod
     def filter_pacientes_diagnostico(diagnostico):
@@ -115,7 +116,7 @@ class RESTRequestHandler(BaseHTTPRequestHandler):
                     HTTPResponseHandler.handle_response(self, 204, [])
             else:
                 HTTPResponseHandler.handle_response(self, 200, pacientes)
-                
+      #Buscar los pacientes por ci
         elif self.path.startswith("/pacientes/"):
             ci = int(self.path.split("/")[-1])
             paciente = PacientesService.find_patient(ci)
@@ -156,7 +157,8 @@ class RESTRequestHandler(BaseHTTPRequestHandler):
 
     def do_DELETE(self):
         if self.path == "/pacientes":
-            pacientes = PacientesService.delete_patient()
+            ci = int(self.path.split("/")[-1])
+            pacientes = PacientesService.delete_patient(ci)
             HTTPResponseHandler.handle_response(self, 200, pacientes)
         else:
             HTTPResponseHandler.handle_response(

@@ -1,16 +1,35 @@
 import requests
+import json
 
-url = "http://localhost:8000/"
+url = "http://localhost:8000/partidas"
 
-# GET /player
-response = requests.request(method="GET", url=url + "player")
+player_eleccion = [
+    {"elemento": "piedra"},
+    {"elemento": "piedra"},
+    {"elemento": "papel"},
+    {"elemento": "tijera"},
+]
+
+for eleccion in player_eleccion:
+    response = requests.post(url, json=eleccion)
+    print("Respuesta del servidor:")
+    print(response.text)
+
+print("\nLista de partidas")
+response = requests.get(url)
 print(response.text)
 
-# POST /player/damage
-response = requests.request(
-    method="POST", url=url + "player/damage", json={"damage": 10}
-)
+print("\nLista el resultado (Ganó)")
+resultado = "gano"
+response = requests.get(f"{url}?resultado={resultado}")
 print(response.text)
 
+print("\nLista el  resultado (Perdió)")
+resultado = "perdio"
+response = requests.get(f"{url}?resultado={resultado}")
+print(response.text)
 
-
+print("\nLista por resultado (Empató)")
+resultado = "empato"
+response = requests.get(f"{url}?resultado={resultado}")
+print(response.text)
